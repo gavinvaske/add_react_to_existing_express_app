@@ -1,78 +1,32 @@
-# Node.JS Starter Template
+# Adding React to an Existing non-react application
 
-The goal of this repository is to offer a quick way to get up and running with a Node.Js project already configured with the basics that all/most Node.JS projects require.
+## The problem this repo was built to solve
+I have an existing application that was build using node.js, express, .ejs, html, css, javascript
 
-With this template you will have a "Hello World" application, with a [Test Suite](#get-started-with-testing) hooked up, and a [Linter](#get-started-with-linting) preconfigured to catch syntax errors, coding mistakes, ect.
+Now, I wish to add react to that application.
 
-See [How to Run this Application](#how-to-run-this-application) next!
-
-## How to Run this Application
-
-  1. Clone this repository by running `git clone https://github.com/gavinvaske/nodejs_starter_template.git` in a terminal
-  2. Open a terminal in the same directory of the cloned repo (i.e ***/nodejs_starter_template**) and run `npm install`
-  3. Run the application via `npm start`
-  4. Open a browser and navigate to `localhost:3000` and thats it, the rest is up to you to create.
-
-Next, see the below sections to use other features that come with this starter template:
-  * [How to write/run tests](#get-started-with-testing)
-  * [How to use the linter](#get-started-with-linting)
-
-## Get Started with Writing Code
-All/most of the code that you will write for your project will live in the `application` folder.
-
-This is where you will create all the code needed for your application to run. If you are creating an API, your endpoints will go here. If you're creating a website, your HTML and css will go into folders which should live within the`/application` folder.
-
-Next, learn all about where to write tests in [this section](#get-started-with-testing) below
+After a fair amount of time researching, below are the options I have to add react to that application:
+  1. Rebuild the application from scratch using React (hahahaha * crying inside *)
+  2. Build a react application for any future endpoints, and place them behind an endpoint such as `/foobar/*`
+    - Then any requests routed to, say, `/foobar/dashboard` or `foobar/account` will directed to the new react application
+    - This requires some extra proxying (probably not too hard) and additional setup, but definietely better than option #1
+  3. Inject react components only into where they are needed.
+    - This is the least amount of work, all you need to do is setup babel, a module bundler (like "webpack" or "parcel" - I chose parcel because of its ease of use)
 
 
-## Get Started with Testing
-This project comes preinstalled with the [Jest](https://github.com/facebook/jest) dependency. **Jest** is a hugely popular and easy to use test library. There are other testing libraries out there, but I find this to be easy to use and works well. 
+I chose solution 3 above because it allows to inject react components into specific locations on HTML pages, without requiring me to rewrite the application in react or do a bunch of other setup. Plus, it takes a step in the direction of converting the application to react, and that work can still be done later if deemed worthwhile.
 
-You can read more about Jest on their website [here](https://jestjs.io/).
+## How to add react components into an existing application
+Okay, so here's how I'm injecting react components into this application.
 
-A single test is included in this project and can be found in `test/index.spec.js`. You should continue to add tests as you write code and all tests should be located within files in the `/test` folder
+Step 1: I setup a location to store the react components, I randomly, without much long-term thought (because this is a proof of concept!) chose `application/public/js/components`
 
-To execute all the tests in the **/test** folder run `npm run test`
+Step 2: Now that you have these components, you need to transpile (using babel) and bundle them (using parcel or webpack or whatever) into a react build. I chose to use parcel. I ran `npm install parcel` and added the script `build` into `package.json`. Parcel is great (in my opinion) because that is ALL the setup I had to do, how nice. (I technically also added a "target" attribute to package.json to setup the location of the react components, and you would also need to do the same, but now, thats officially all you have to do!). **Note:** Parcel comes with babel and is transpiling everything under the hood for you during the build process.
 
-## Get Started with Linting
-Many syntax errors/code mistakes can hide in Javascript. A linter will analyze your code in real time and report any problems it finds.
+Step 3: Now we have our react components, they've been transpiles with babel, and bundled using parcel, now we need to inject them into the application! I added the location to the `/build` or also called `/dist` in express with the line: `app.use(express.static('/build'))` to `index.js`. This tells express that I want my UI pages to have access to the build react components, this step leads into step 4.
 
-This project uses a hugely popular library called [eslint](https://github.com/eslint/eslint). A basic set of lint rules have already been configured and you can find them or edit them in the file called `.eslintrc.js`
+Step 4: Add a src tag in your index.html/index.ejs/whatever-primary-html-file-name.html that references the transpiled/bundled react components. In my `application/views/index.ejs` I added `<script src="/App.js" type="text/javascript"></script>`
 
-This linter can be executed by running `npm run lint`
 
-## Preconfigured Scripts You Can Run
+**Note:** A lot of the decisions I chose above matched my use case, but if you understand the process around #1 needing a transpiler, #2 needing a bundler (like webpack or parcel or ect), #3 referencing the built/bunded react components into your `index.html`, then you can reverse engineer this process to match your specific needs.
 
-This repo comes with a few scripts that are setup for you to use out of the box, below is a summary of each and every script that you have access to run and what it does.
-
-  1. `npm run start`
-      * Use this to start the application/server
-  3. `npm run test`
-      * Executes all tests found within the `/test` directory
-  5. `npm run lint`
-      * Checks all code and looks for problems. You can see/edit the lint rules it is uses in the file called `.eslintrc.js`
-  7. `npm run fix-lint`
-      * Attempts to fix simple eslint errors (i.e. missing semicolon, incorrect number of tab spaces, ect)
-  9. `npm run verify`
-      * Runs both of the commands `npm run test` AND `npm run lint` at the same time. Great to use before commiting code! (Hint Hint 😉)
-
-## Run the application with Docker.
-  1. [Download docker](https://docs.docker.com/get-docker/) onto your computer
-  2. Clone this repo if you have not already, then navigate to the root directory in a terminal window
-  3. Build a docker image of the application via the command: `docker build . -t <insert-image-name-here>`
-      - **Ex:** docker build . -t my_awesome_application
-  4. Run the docker image via: `docker run -p 49160:8080 <insert-image-name-here>`
-      - **Ex:** docker run -p 49160:8080 my_awesome_application
-  5. Visit `localhost:49160` to the application which is running in docker
-
-## What Dependencies are included in this template?
-This section describes all the dependencies that are included in this template. Some of the chosen dependencies have equivalent competitors, so the decision to use these is opion based. But from experience, the selected dependencies work very well, are hugely popular with a large community and have a minimal learning curve.
-
-  1. [Express.js](https://expressjs.com/)
-      * Used to easily create HTTP endpoints and much more. A dependency such as Express.js is a fundamental backbone to all/most Node.js applications
-  2. [Jest](https://github.com/facebook/jest)
-      * A framework for writing Tests for your application
-  4. [Dotenv](https://github.com/motdotla/dotenv)
-      * Whenever a `.env` file is used, you need this dependency to read to read it in
-  5. [eslint](https://eslint.org/)
-      * Used to analyze code and catch syntax or logic errors that may otherwise go unnoticed or cause issues
