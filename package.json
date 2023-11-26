@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "An application used to get up and running with a new nodejs project with a linter, test library and basic configuration already setup",
   "browserslist": "> 0.25%, not dead",
-  "distDir": "build",
   "targets": {
     "resources": {
       "source": "application/public/js/components/App/App.js",
@@ -23,13 +22,13 @@
   "license": "ISC",
   "devDependencies": {
     "eslint": "8.18.0",
-    "jest": "28.1.1"
+    "jest": "28.1.1",
+    "parcel": "2.10.3"
   },
   "dependencies": {
     "dotenv": "16.0.1",
     "ejs": "3.1.9",
     "express": "4.17.2",
-    "parcel": "2.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }
